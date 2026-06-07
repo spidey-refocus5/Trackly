@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0a0f1e" />
+  <meta name="description" content="Trackly - Track Habits. Build Consistency." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Trackly" />
+  <title>Trackly</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <style>
+    /* ── OFFLINE-SAFE FONTS ── */
+    /* Display font: Futura-style geometric sans — available on most OS */
+    @font-face {
+      font-family: 'TracklyDisplay';
+      src: local('Futura Medium'), local('Futura-Medium'),
+           local('Century Gothic'), local('CenturyGothic'),
+           local('Trebuchet MS'), local('TrebuchetMS'),
+           local('Gill Sans'), local('GillSans'),
+           local('Optima'), local('Arial Rounded MT Bold');
+      font-weight: 700 800;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'TracklyBody';
+      src: local('SF Pro Text'), local('SFProText-Regular'),
+           local('-apple-system'), local('BlinkMacSystemFont'),
+           local('Segoe UI'), local('SegoeUI'),
+           local('Helvetica Neue'), local('HelveticaNeue'),
+           local('Helvetica'), local('Arial');
+      font-weight: 300 400 500 600;
+      font-style: normal;
+    }
+  </style>
+  <style>
+    :root {
+      --bg: #07091a;
+      --surface: #0d1230;
+      --surface2: #131940;
+      --blue: #2563eb;
+      --blue-light: #3b82f6;
+      --green: #10d98a;
+      --green-dark: #0eb87a;
+      --sun: #f5a623;
+      --moon: #6c8fc7;
+      --text: #e8edf8;
+      --text-muted: #7a89b0;
+      --border: rgba(59,130,246,0.15);
+      --radius: 20px;
+      --card-radius: 16px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'TracklyBody', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body {
+      background: radial-gradient(ellipse at 20% 0%, #0e1e4a 0%, transparent 55%),
+                  radial-gradient(ellipse at 80% 100%, #081e30 0%, transparent 55%),
+                  var(--bg);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 16px 20px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(7,9,26,0.85);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 0 12px rgba(16,217,138,0.3);
+    }
+
+    .logo-text {
+      font-family: 'TracklyDisplay', 'Century Gothic', 'Futura', 'Trebuchet MS', 'Gill Sans', Arial, sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .logo-text span:first-child { color: #fff; }
+    .logo-text span:last-child { color: var(--green); }
+
+    .header-date {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-align: right;
+    }
+    .header-date strong {
+      display: block;
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px 16px 120px;
+    }
+
+    /* ── STREAK BAR ── */
+    .streak-bar {
+      background: linear-gradient(135deg, #0d1a3e 0%, #0a1628 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .streak-fire {
+      font-size: 32px;
+      line-height: 1;
+      filter: drop-shadow(0 0 8px rgba(245,166,35,0.6));
+    }
+
+    .streak-info { flex: 1; }
+    .streak-num {
+      font-family: 'TracklyDisplay', 'Century Gothic', 'Futura', 'Trebuchet MS', 'Gill Sans', Arial, sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--sun), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .streak-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .progress-ring-wrap {
+      position: relative;
+      width: 52px;
+      height: 52px;
+    }
+    .progress-ring-wrap svg {
+      transform: rotate(-90deg);
+    }
+    .progress-ring-bg { stroke: rgba(59,130,246,0.12); }
+    .progress-ring-fill {
+      stroke: url(#ringGrad);
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+    .progress-pct {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'TracklyDisplay', 'Century Gothic', 'Futura', 'Trebuchet MS', 'Gill Sans', Arial, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    /* ── WEEK VIEW ── */
+    .week-view {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.5s ease 0.05s both;
+    }
+
+    .week-day {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .week-day-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .week-day-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1.5px solid transparent;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+
+    .week-day-dot.today {
+      border-color: var(--blue-light);
+      color: var(--text);
+      box-shadow: 0 0 10px rgba(59,130,246,0.3);
+    }
+
+    .week-day-dot.complete {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--green) 100%);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(16,217,138,0.35);
+    }
+
+    .week-day-dot.partial {
+      background: rgba(37,99,235,0.2);
+      border-color: var(--blue);
+      color: var(--blue-light);
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-family: 'TracklyDisplay', 'Century Gothic', 'Futura', 'Trebuchet MS', 'Gill Sans', Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-badge {
+      background: rgba(59,130,246,0.15);
+      color: var(--blue-light);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    /* ── HABIT CARD ── */
+    .habits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .habit-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      animation: fadeUp 0.4s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .habit-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--habit-color, var(--blue));
+      border-radius: 3px 0 0 3px;
+    }
+
+    .habit-card:active { transform: scale(0.98); }
+
+    .habit-card.done {
+      border-color: rgba(16,217,138,0.2);
+      background: rgba(16,217,138,0.05);
+    }
+
+    .habit-card.done::before {
+      background: var(--green);
+    }
+
+    .habit-check {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid var(--habit-color, var(--blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      background: transparent;
+    }
+
+    .habit-card.done .habit-check {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--green) 100%);
+      border-color: transparent;
+      box-shadow: 0 0 16px rgba(16,217,138,0.4);
+      transform: scale(1.05);
+    }
+
+    .habit-check svg {
+      width: 16px;
+      height: 16px;
+      stroke: white;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) 0.05s;
+    }
+
+    .habit-card.done .habit-check svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .habit-info { flex: 1; min-width: 0; }
+
+    .habit-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .habit-card.done .habit-name {
+      color: var(--text-muted);
+      text-decoration: line-through;
+      text-decoration-color: rgba(122,137,176,0.5);
+    }
+
+    .habit-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .habit-time-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .habit-time-badge.morning {
+      background: rgba(245,166,35,0.12);
+      color: var(--sun);
+    }
+
+    .habit-time-badge.evening {
+      background: rgba(108,143,199,0.15);
+      color: var(--moon);
+    }
+
+    .habit-time-badge.anytime {
+      background: rgba(59,130,246,0.12);
+      color: var(--blue-light);
+    }
+
+    .habit-streak-mini {
+      font-size: 10px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .habit-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-delete {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(239,68,68,0.1);
+      border: none;
+      color: rgba(239,68,68,0.6);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-delete:hover {
+      background: rgba(239,68,68,0.2);
+      color: #ef4444;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── ADD HABIT FAB ── */
+    .fab {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--green) 100%);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 14px 28px;
+      font-family: 'TracklyDisplay', 'Century Gothic', 'Futura', 'Trebuchet MS', 'Gill Sans', Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 32px rgba(16,217,138,0.25), 0 2px 8px rgba(0,0,0,0.4);
+      transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      letter-spacing: 0.3px;
+    }
+
+    .fab:hover { opacity: 0.92; }
+    .fab:active { transform: scale(0.97); }
+
+    /* ── MODAL ── */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 300;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal {
+      background: #111830;
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 28px 28px 0 0;
+      padding: 28px 24px 40px;
+      width: 100%;
+      max-width: 480px;
+      animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .modal-handle {
+      width: 36px;
+      height: 4px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+      margin: 0 auto 24px;
+    }
+
+    .modal-title {
+      font-family: 'TracklyDisplay', 'Century Gothic', 'Futura', 'Trebuchet MS', 'Gill Sans', Arial, sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 20px;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-family: 'TracklyBody', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--blue-light);
+    }
+
+    .form-input::placeholder { color: var(--text-muted); }
+
+    /* Pill selector */
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'TracklyBody', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pill.active {
+      border-color: var(--blue-light);
+      background: rgba(59,130,246,0.15);
+      color: var(--blue-light);
+    }
+
+    /* Color swatch */
+    .color-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .color-swatch.active::after {
+      content: '✓';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: white;
+      font-weight: 700;
+    }
+
+    .color-swatch.active {
+      border-color: white;
+      box-shadow: 0 0 10px rgba(255,255,255,0.3);
+    }
+
+    .btn-add {
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--green) 100%);
+      border: none;
+      color: white;
+      font-family: 'TracklyDisplay', 'Century Gothic', 'Futura', 'Trebuchet MS', 'Gill Sans', Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-add:hover { opacity: 0.92; }
+    .btn-add:active { transform: scale(0.98); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    @keyframes pop {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.18); }
+      70%  { transform: scale(0.93); }
+      100% { transform: scale(1); }
+    }
+
+    .habit-card.pop-anim .habit-check {
+      animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    /* Confetti burst */
+    .confetti-wrap {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 500;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      background: rgba(16,217,138,0.15);
+      border: 1px solid rgba(16,217,138,0.4);
+      color: var(--green);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 400;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── BOTTOM BAR ── */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px 20px 28px;
+      background: linear-gradient(to top, rgba(7,9,26,1) 60%, transparent);
+    }
+
+    .fab { flex: 1; max-width: 260px; }
+
+    /* ── INSTALL BUTTON ── */
+    .btn-install {
+      display: none;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.75);
+      border-radius: 30px;
+      padding: 13px 20px;
+      font-family: 'TracklyDisplay', 'Century Gothic', Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      letter-spacing: 0.2px;
+    }
+    .btn-install.visible { display: flex; }
+    .btn-install:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.25); }
+    .btn-install:active { transform: scale(0.97); }
+
+    /* ── INSTALL STEPS ── */
+    .install-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .install-step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(59,130,246,0.15);
+      border: 1px solid rgba(59,130,246,0.3);
+      color: var(--blue-light);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <img class="logo-icon" src="icon-192.png" alt="Trackly" />
+    <div class="logo-text">
+      <span>TRACK</span><span>LY</span>
+    </div>
+  </div>
+  <div class="header-date">
+    <strong id="headerDay">Sunday</strong>
+    <span id="headerDate">Jun 7, 2026</span>
+  </div>
+</header>
+
+<main>
+  <!-- STREAK + PROGRESS -->
+  <div class="streak-bar">
+    <div class="streak-fire">🔥</div>
+    <div class="streak-info">
+      <div class="streak-num" id="streakNum">0</div>
+      <div class="streak-label">day streak</div>
+    </div>
+    <div class="progress-ring-wrap">
+      <svg width="52" height="52" viewBox="0 0 52 52">
+        <defs>
+          <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2563eb"/>
+            <stop offset="100%" stop-color="#10d98a"/>
+          </linearGradient>
+        </defs>
+        <circle class="progress-ring-bg" cx="26" cy="26" r="22" stroke-width="4" fill="none"/>
+        <circle class="progress-ring-fill" id="progressRing" cx="26" cy="26" r="22"
+          stroke-width="4" fill="none"
+          stroke-dasharray="138.2"
+          stroke-dashoffset="138.2"
+        />
+      </svg>
+      <div class="progress-pct" id="progressPct">0%</div>
+    </div>
+  </div>
+
+  <!-- WEEK VIEW -->
+  <div class="week-view" id="weekView"></div>
+
+  <!-- HABITS -->
+  <div class="section-header">
+    <div class="section-title">
+      Today's Habits
+      <span class="section-badge" id="habitCount">0</span>
+    </div>
+  </div>
+  <div class="habits-list" id="habitsList"></div>
+</main>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+  <button class="fab" id="fabBtn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    Add Habit
+  </button>
+  <button class="btn-install visible" id="installBtn">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2v13M7 11l5 5 5-5"/><path d="M3 18h18v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z"/>
+    </svg>
+    Install
+  </button>
+</div>
+
+<!-- INSTALL GUIDE MODAL -->
+<div class="modal-backdrop" id="installModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Install Trackly 📲</div>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px;line-height:1.6;">Add Trackly to your home screen like a real app — no app store needed!</p>
+
+    <!-- Android steps -->
+    <div id="androidSteps">
+      <div class="install-step">
+        <div class="install-step-num">1</div>
+        <div>Tap the <strong>three dots ⋮</strong> menu at the top right of Chrome</div>
+      </div>
+      <div class="install-step">
+        <div class="install-step-num">2</div>
+        <div>Tap <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong></div>
+      </div>
+      <div class="install-step">
+        <div class="install-step-num">3</div>
+        <div>Tap <strong>Add</strong> — Trackly appears on your home screen! ✅</div>
+      </div>
+    </div>
+
+    <!-- iOS steps -->
+    <div id="iosSteps" style="display:none">
+      <div class="install-step">
+        <div class="install-step-num">1</div>
+        <div>Tap the <strong>Share button</strong> at the bottom of Safari</div>
+      </div>
+      <div class="install-step">
+        <div class="install-step-num">2</div>
+        <div>Scroll down and tap <strong>"Add to Home Screen"</strong></div>
+      </div>
+      <div class="install-step">
+        <div class="install-step-num">3</div>
+        <div>Tap <strong>Add</strong> — Trackly appears on your home screen! ✅</div>
+      </div>
+    </div>
+
+    <button class="btn-add" id="closeInstallModal" style="margin-top:20px;">Got it!</button>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">New Habit ✦</div>
+
+    <div class="form-group">
+      <label class="form-label">Habit Name</label>
+      <input class="form-input" id="habitName" type="text" placeholder="e.g. Morning meditation" maxlength="40" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Time of Day</label>
+      <div class="pill-row" id="timePills">
+        <button class="pill active" data-val="morning">🌅 Morning</button>
+        <button class="pill" data-val="evening">🌙 Evening</button>
+        <button class="pill" data-val="anytime">⚡ Anytime</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Color</label>
+      <div class="color-row" id="colorRow">
+        <div class="color-swatch active" data-color="#2563eb" style="background:#2563eb"></div>
+        <div class="color-swatch" data-color="#10d98a" style="background:#10d98a"></div>
+        <div class="color-swatch" data-color="#f5a623" style="background:#f5a623"></div>
+        <div class="color-swatch" data-color="#e040fb" style="background:#e040fb"></div>
+        <div class="color-swatch" data-color="#ef4444" style="background:#ef4444"></div>
+        <div class="color-swatch" data-color="#06b6d4" style="background:#06b6d4"></div>
+      </div>
+    </div>
+
+    <button class="btn-add" id="addHabitBtn">Add Habit</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem('trackly_data') || '{}'); } catch { return {}; }
+}
+
+function saveData(d) {
+  localStorage.setItem('trackly_data', JSON.stringify(d));
+}
+
+function loadHabits() {
+  try { return JSON.parse(localStorage.getItem('trackly_habits') || '[]'); } catch { return []; }
+}
+
+function saveHabits(h) {
+  localStorage.setItem('trackly_habits', JSON.stringify(h));
+}
+
+const todayKey = () => new Date().toISOString().slice(0, 10);
+
+let habits = loadHabits();
+let data   = loadData();
+let selectedTime  = 'morning';
+let selectedColor = '#2563eb';
+
+// ── DATE HEADER ──
+function initHeader() {
+  const now = new Date();
+  document.getElementById('headerDay').textContent = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][now.getDay()];
+  document.getElementById('headerDate').textContent = `${MONTHS[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+}
+
+// ── WEEK VIEW ──
+function buildWeek() {
+  const today = new Date();
+  const container = document.getElementById('weekView');
+  container.innerHTML = '';
+  const td = todayKey();
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const dayData = data[key] || {};
+    const doneCount = Object.values(dayData).filter(Boolean).length;
+    const total = habits.length;
+    const isToday = key === td;
+    let cls = '';
+    if (doneCount > 0 && total > 0) {
+      cls = doneCount >= total ? 'complete' : 'partial';
+    }
+    if (isToday) cls += (cls ? ' ' : '') + 'today';
+
+    container.innerHTML += `
+      <div class="week-day">
+        <span class="week-day-label">${DAYS[d.getDay()]}</span>
+        <div class="week-day-dot ${cls}">${d.getDate()}</div>
+      </div>`;
+  }
+}
+
+// ── PROGRESS ──
+function updateProgress() {
+  const td = todayKey();
+  const dayData = data[td] || {};
+  const total = habits.length;
+  const done  = habits.filter(h => dayData[h.id]).length;
+  const pct   = total ? Math.round((done / total) * 100) : 0;
+  const circ  = 138.2;
+  const offset = circ - (pct / 100) * circ;
+  document.getElementById('progressRing').style.strokeDashoffset = offset;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('habitCount').textContent = total;
+
+  // streak
+  let streak = 0;
+  const now = new Date();
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    const k = d.toISOString().slice(0, 10);
+    const dd = data[k] || {};
+    const cnt = habits.filter(h => dd[h.id]).length;
+    if (cnt > 0 && habits.length > 0 && cnt >= habits.length) streak++;
+    else if (i > 0) break;
+  }
+  document.getElementById('streakNum').textContent = streak;
+}
+
+// ── RENDER HABITS ──
+function renderHabits() {
+  const list = document.getElementById('habitsList');
+  const td = todayKey();
+  const dayData = data[td] || {};
+
+  if (habits.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🌱</div>
+        <p>No habits yet.<br/>Tap <strong>Add Habit</strong> to start your journey!</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  habits.forEach((h, idx) => {
+    const done = !!dayData[h.id];
+    const timeLabel = h.time === 'morning'
+      ? '<span class="habit-time-badge morning">🌅 Morning</span>'
+      : h.time === 'evening'
+      ? '<span class="habit-time-badge evening">🌙 Evening</span>'
+      : '<span class="habit-time-badge anytime">⚡ Anytime</span>';
+
+    // mini streak for this habit
+    let hStreak = 0;
+    const now = new Date();
+    for (let i = 1; i <= 30; i++) {
+      const d = new Date(now);
+      d.setDate(now.getDate() - i);
+      const k = d.toISOString().slice(0, 10);
+      if ((data[k] || {})[h.id]) hStreak++;
+      else break;
+    }
+
+    const card = document.createElement('div');
+    card.className = `habit-card${done ? ' done' : ''}`;
+    card.style.setProperty('--habit-color', h.color);
+    card.style.animationDelay = `${idx * 0.04}s`;
+    card.dataset.id = h.id;
+
+    card.innerHTML = `
+      <div class="habit-check">
+        <svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="habit-info">
+        <div class="habit-name">${h.name}</div>
+        <div class="habit-meta">
+          ${timeLabel}
+          ${hStreak > 0 ? `<span class="habit-streak-mini">🔥 ${hStreak}d</span>` : ''}
+        </div>
+      </div>
+      <div class="habit-actions">
+        <button class="btn-delete" data-id="${h.id}" title="Remove">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+
+    // toggle on card click (not delete btn)
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.btn-delete')) return;
+      toggleHabit(h.id, card);
+    });
+
+    card.querySelector('.btn-delete').addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeHabit(h.id);
+    });
+
+    list.appendChild(card);
+  });
+
+  updateProgress();
+  buildWeek();
+}
+
+function toggleHabit(id, card) {
+  const td = todayKey();
+  if (!data[td]) data[td] = {};
+  data[td][id] = !data[td][id];
+  saveData(data);
+  card.classList.toggle('done', !!data[td][id]);
+  card.classList.add('pop-anim');
+  setTimeout(() => card.classList.remove('pop-anim'), 500);
+  if (data[td][id]) showToast('✓ Habit completed!');
+  updateProgress();
+  buildWeek();
+}
+
+function removeHabit(id) {
+  habits = habits.filter(h => h.id !== id);
+  saveHabits(habits);
+  renderHabits();
+  showToast('Habit removed');
+}
+
+// ── ADD HABIT ──
+document.getElementById('fabBtn').addEventListener('click', () => {
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('habitName').focus();
+});
+
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('modal'))
+    document.getElementById('modal').classList.remove('open');
+});
+
+// time pills
+document.getElementById('timePills').addEventListener('click', (e) => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  document.querySelectorAll('#timePills .pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  selectedTime = pill.dataset.val;
+});
+
+// color swatches
+document.getElementById('colorRow').addEventListener('click', (e) => {
+  const swatch = e.target.closest('.color-swatch');
+  if (!swatch) return;
+  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  swatch.classList.add('active');
+  selectedColor = swatch.dataset.color;
+});
+
+document.getElementById('addHabitBtn').addEventListener('click', () => {
+  const name = document.getElementById('habitName').value.trim();
+  if (!name) {
+    document.getElementById('habitName').focus();
+    document.getElementById('habitName').style.borderColor = '#ef4444';
+    setTimeout(() => document.getElementById('habitName').style.borderColor = '', 1000);
+    return;
+  }
+
+  const habit = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    name,
+    time: selectedTime,
+    color: selectedColor,
+    createdAt: new Date().toISOString()
+  };
+
+  habits.push(habit);
+  saveHabits(habits);
+
+  // reset modal
+  document.getElementById('habitName').value = '';
+  document.getElementById('modal').classList.remove('open');
+  renderHabits();
+  showToast('🎉 Habit added!');
+});
+
+// enter key
+document.getElementById('habitName').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('addHabitBtn').click();
+});
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── INIT ──
+initHeader();
+renderHabits();
+updateProgress();
+buildWeek();
+
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ── PWA INSTALL ──
+let deferredPrompt = null;
+const installBtn = document.getElementById('installBtn');
+const installModal = document.getElementById('installModal');
+
+// Detect iOS
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+// Hide install button if already installed
+if (isInStandaloneMode) {
+  installBtn.classList.remove('visible');
+}
+
+// Show iOS steps if on iOS
+if (isIOS) {
+  document.getElementById('androidSteps').style.display = 'none';
+  document.getElementById('iosSteps').style.display = 'block';
+}
+
+// Capture Chrome's native install prompt
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+installBtn.addEventListener('click', async () => {
+  if (deferredPrompt) {
+    // Native prompt available — use it directly
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      installBtn.classList.remove('visible');
+      showToast('✓ Trackly installed!');
+    }
+    deferredPrompt = null;
+  } else {
+    // Fallback — show step-by-step guide
+    installModal.classList.add('open');
+  }
+});
+
+document.getElementById('closeInstallModal').addEventListener('click', () => {
+  installModal.classList.remove('open');
+});
+
+installModal.addEventListener('click', (e) => {
+  if (e.target === installModal) installModal.classList.remove('open');
+});
+
+window.addEventListener('appinstalled', () => {
+  installBtn.classList.remove('visible');
+  deferredPrompt = null;
+  showToast('✓ Trackly installed!');
+});
+</script>
+</body>
+</html>
