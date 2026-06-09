@@ -813,7 +813,7 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2v13M7 11l5 5 5-5"/><path d="M3 18h18v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z"/>
         </svg>
-        Install Trackly
+        Install 
       </button>
 
     </div>
@@ -1211,10 +1211,26 @@ async function handleAuth() {
   }
 
   if (authMode === 'signup') {
-    sucEl.textContent = '✅ Check your email to confirm your account, then sign in!';
-    sucEl.style.display = 'block';
+  // Email confirmation OFF → Supabase returns a session
+  if (d.access_token) {
+    currentToken = d.access_token;
+    currentUser = d.user;
+
+    localStorage.setItem(
+      'trackly_session',
+      JSON.stringify({ refresh_token: d.refresh_token })
+    );
+
+    await afterLogin();
     return;
   }
+
+  // Email confirmation ON
+  sucEl.textContent = '✅ Check your email to confirm your account, then sign in!';
+  sucEl.style.display = 'block';
+  return;
+    }
+  
 
   currentToken = d.access_token;
   currentUser  = d.user;
